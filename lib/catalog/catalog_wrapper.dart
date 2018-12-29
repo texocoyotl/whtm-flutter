@@ -11,8 +11,8 @@ class CatalogWrapper extends StatelessWidget {
           appBar: AppBar(
             title: Text('Catalogs'),
             bottom: TabBar(tabs: [
-              Tab(icon: Icon(Icons.perm_identity), text: 'Players'),
-              Tab(icon: Icon(Icons.list), text: 'Armies'),
+              Tab(icon: Icon(Icons.perm_identity), text: 'Player Lists'),
+              Tab(icon: Icon(Icons.list), text: 'Meta Lists'),
             ]),
           ),
           body: TabBarView(
@@ -20,6 +20,11 @@ class CatalogWrapper extends StatelessWidget {
               CatalogPlayersPage(),
               CatalogArmiesPage(),
             ],
+          ),
+          floatingActionButton: FloatingActionButton(
+              onPressed: null,
+              elevation: 20,
+              child: Icon(Icons.add),
           ),
         ));
   }
