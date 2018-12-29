@@ -40,11 +40,11 @@ class LoginPageState extends State<LoginPage> {
         bloc: _loginBloc,
         builder: (BuildContext context, LoginState state) {
           Widget content;
-          SessionBloc authBloc = BlocProvider.of<SessionBloc>(context);
+          SessionBloc sessionBloc = BlocProvider.of<SessionBloc>(context);
 
           if (state.loadingMessage.isNotEmpty) {
-            if (state.token.isNotEmpty && state.isDataLoaded) {
-              authBloc.dispatch(SessionLogin(state.token));
+            if (state.session != null && state.isDataLoaded) {
+              sessionBloc.dispatch(SessionLogin(state.session));
             }
             content = _loader(state.loadingMessage);
           } else {

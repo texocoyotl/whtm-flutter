@@ -1,21 +1,16 @@
-import '../models/faction_model.dart';
+import '../models/session_model.dart';
 
 class SessionState {
 
-  final String token;
-  final List<FactionModel> factions;
+  final SessionModel session;
 
-  const SessionState({this.token, this.factions});
+  const SessionState(this.session);
 
   factory SessionState.unauthorized(){
-    return SessionState(token: null);
+    return SessionState(null);
   }
 
-  factory SessionState.authorized(String token){
-    return SessionState(token: token);
-  }
-
-  factory SessionState.dataFetched(String token, List<FactionModel> factions){
-    return SessionState(token: token, factions: factions);
+  factory SessionState.sessionStart(SessionModel session){
+    return SessionState(session);
   }
 }

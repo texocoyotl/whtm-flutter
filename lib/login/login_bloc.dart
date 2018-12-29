@@ -6,6 +6,7 @@ import "login_state.dart";
 import "../models/team_model.dart";
 import '../models/login_model.dart';
 import '../models/faction_model.dart';
+import '../models/session_model.dart';
 import "package:whtm/api_provider.dart";
 import 'package:whtm/api_exception.dart';
 
@@ -50,10 +51,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
           _factions = _factions ?? await apiProvider.fetchFactions(login.token);
 
-          yield currentState.copyWith(loadingMessage: 'Loading Factions...');
+          yield currentState.copyWith(loadingMessage: 'Loading Team Data...');
 
+          TeamModel team = await apiProvider.fetchTeam(login.token, event.teamId);
 
-          yield currentState.copyWith(token: login.token, factions: _factions, isDataLoaded: true, loadingMessage: 'Loading Complete');
+          SessionModel session = SessionModel(token: login.token, factions: _factions, team: team);
+
+          yield currentState.copyWith(isDataLoaded: true, loadingMessage: 'Loading Complete', session: session);
         }
       } on ApiException catch(e){
         yield currentState.copyWith(loadingMessage: '', error: e.message);

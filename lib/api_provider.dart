@@ -9,7 +9,7 @@ import 'api_exception.dart';
 class ApiProvider {
   Client client = Client();
   final baseUrl = 'https://whtmapi.herokuapp.com/';
-  final defaultApiExceptionMessage = 'Could not load factions, please check your network connection.';
+  final defaultApiExceptionMessage = 'Could not load data, please check your network connection.';
 
   void close(){
     client.close();
@@ -63,7 +63,7 @@ class ApiProvider {
     }
   }
 
-  Future<List<FactionModel>> fetchTeam(String token, String teamId) async {
+  Future<TeamModel> fetchTeam(String token, String teamId) async {
     final String url = baseUrl + 'team/$teamId';
     print('API Call: $url');
     final response = await client.get(url, headers: {'x-access-token': token});
@@ -71,8 +71,8 @@ class ApiProvider {
 
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON
-      List<dynamic> jsonResponse = json.decode(response.body) as List;
-      return jsonResponse.map((e) => new FactionModel.fromJson(e)).toList();
+      Map<String, dynamic> jsonResponse = json.decode(response.body);
+      return TeamModel.fromJson(jsonResponse);
     } else {
       // If that call was not successful, throw an error.
       throw ApiException(defaultApiExceptionMessage);

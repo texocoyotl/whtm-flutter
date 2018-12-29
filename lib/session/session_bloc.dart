@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 
 import 'package:whtm/session/session_event.dart';
 import 'package:whtm/session/session_state.dart';
+import '../models/session_model.dart';
 
 class SessionBloc extends Bloc<SessionEvent, SessionState>{
 
@@ -14,7 +15,7 @@ class SessionBloc extends Bloc<SessionEvent, SessionState>{
       SessionEvent event) async* {
 
       if (event is SessionLogin){
-        yield SessionState.authorized(event.token);
+        yield SessionState.sessionStart(event.session);
       }
 
       if (event is SessionLogout){
@@ -22,7 +23,6 @@ class SessionBloc extends Bloc<SessionEvent, SessionState>{
       }
   }
 
-  String get token{
-    return currentState.token;
-  }
+  SessionModel get session => currentState.session;
+
 }

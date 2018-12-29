@@ -33,7 +33,7 @@ class AppState extends State<App> {
         builder: (BuildContext context, SessionState state) {
           Widget content;
 
-          if (state.token != null) {
+          if (state.session != null) {
             content = MetaWrapper(() => _authBloc.dispatch(SessionLogout()));
           } else {
             content = LoginWrapper('Login', LoginPage());
