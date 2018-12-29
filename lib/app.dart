@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:whtm/auth/auth.dart';
+import 'package:whtm/session/session.dart';
 
-import 'main_wrapper.dart';
-import 'meta/meta_page.dart';
+import 'package:whtm/meta/meta_wrapper.dart';
+import 'package:whtm/login/login_wrapper.dart';
+
 import 'login/login_page.dart';
 
 class App extends StatefulWidget {
@@ -12,7 +13,7 @@ class App extends StatefulWidget {
 }
 
 class AppState extends State<App> {
-  final AuthBloc _authBloc = AuthBloc();
+  final SessionBloc _authBloc = SessionBloc();
 
   @override
   void dispose() {
@@ -22,20 +23,20 @@ class AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthBloc>(
+    return BlocProvider<SessionBloc>(
         bloc: _authBloc, child: MaterialApp(home: _content()));
   }
 
   Widget _content() {
-    return BlocBuilder<AuthEvent, AuthState>(
+    return BlocBuilder<SessionEvent, SessionState>(
         bloc: _authBloc,
-        builder: (BuildContext context, AuthState state) {
+        builder: (BuildContext context, SessionState state) {
           Widget content;
 
           if (state.token != null) {
-            content = MainWrapper('Meta Analysis', MetaPage());
+            content = MetaWrapper(() => _authBloc.dispatch(SessionLogout()));
           } else {
-            content = MainWrapper('Login', LoginPage());
+            content = LoginWrapper('Login', LoginPage());
           }
 
           return content;

@@ -5,6 +5,7 @@ import "login_event.dart";
 import "login_state.dart";
 import "../models/team_model.dart";
 import '../models/login_model.dart';
+import '../models/faction_model.dart';
 import "package:whtm/api_provider.dart";
 import 'package:whtm/api_exception.dart';
 
@@ -12,9 +13,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   final ApiProvider apiProvider = ApiProvider();
   List<TeamModel> _teams;
+  List<FactionModel> _factions;
 
   @override
-  LoginState get initialState => LoginState.loading();
+  LoginState get initialState => LoginState.loading('Loading Teams...');
 
   @override
   void dispose() {
@@ -35,19 +37,28 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
 
     if (event is LoginAuthenticate){
-      yield LoginState.loading();
+      yield currentState.copyWith(loadingMessage: 'Authenticating...');
 
       try {
         LoginModel login = await apiProvider.authenticate(
             event.teamId, event.password);
 
         if (login.token == null || login.token.isEmpty) {
-          yield LoginState.withError(currentState.teams, login.message);
+          yield currentState.copyWith(loadingMessage: '', error: login.message);
         } else {
-          yield LoginState.authenticated(login.token);
+          yield currentState.copyWith(loadingMessage: 'Loading Factions...');
+
+          _factions = _factions ?? await apiProvider.fetchFactions(login.token);
+
+          yield currentState.copyWith(loadingMessage: 'Loading Factions...');
+
+
+          yield currentState.copyWith(token: login.token, factions: _factions, isDataLoaded: true, loadingMessage: 'Loading Complete');
         }
       } on ApiException catch(e){
-        yield LoginState.withError(currentState.teams, e.message);
+        yield currentState.copyWith(loadingMessage: '', error: e.message);
+      } on Exception catch(e){
+        yield currentState.copyWith(loadingMessage: '', error: e.toString());
       }
     }
   }

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:whtm/login/login.dart';
 import '../models/team_model.dart';
-import 'package:whtm/auth/auth.dart';
+import 'package:whtm/session/session.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -20,7 +20,7 @@ class LoginPageState extends State<LoginPage> {
 
   String _selectedTeamId;
   String _password;
-  bool _snack_displayed = false;
+  bool _snackDisplayed = false;
 
   @override
   void initState() {
@@ -40,16 +40,16 @@ class LoginPageState extends State<LoginPage> {
         bloc: _loginBloc,
         builder: (BuildContext context, LoginState state) {
           Widget content;
-          AuthBloc authBloc = BlocProvider.of<AuthBloc>(context);
+          SessionBloc authBloc = BlocProvider.of<SessionBloc>(context);
 
-          if (state.token.isNotEmpty){
-            authBloc.dispatch(AuthLoginSuccessful(state.token));
-            content = _loader();
-          } else if (state.isLoading) {
-            content = _loader();
+          if (state.loadingMessage.isNotEmpty) {
+            if (state.token.isNotEmpty && state.isDataLoaded) {
+              authBloc.dispatch(SessionLogin(state.token));
+            }
+            content = _loader(state.loadingMessage);
           } else {
-            if (state.error.isNotEmpty && !_snack_displayed) {
-              _snack_displayed = true;
+            if (state.error.isNotEmpty && !_snackDisplayed) {
+              _snackDisplayed = true;
               _onWidgetDidBuild(() {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
@@ -66,14 +66,23 @@ class LoginPageState extends State<LoginPage> {
         });
   }
 
-  Widget _loader() => Stack(
+  Widget _loader(String message) => Stack(
         children: <Widget>[
           Opacity(
             opacity: 0.3,
             child: ModalBarrier(dismissible: false, color: Colors.grey),
           ),
           Center(
-            child: CircularProgressIndicator(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                Padding(
+                  padding: EdgeInsets.only(top: 16),
+                ),
+                Text(message),
+              ]
+            )
           ),
         ],
       );
@@ -123,7 +132,7 @@ class LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
-                    _snack_displayed = false;
+                    _snackDisplayed = false;
                     _loginBloc.dispatch(LoginAuthenticate(_selectedTeamId, _password));
                     print('Attempt login');
                   }
